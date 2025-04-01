@@ -23,7 +23,7 @@ os.makedirs('data', exist_ok=True)
 if not os.path.exists(CSV_FILE):
     with open(CSV_FILE, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['id', 'designation', 'description', 'classification', 'matiere', 'image', 'pdfs'])
+        writer.writerow(['id', 'designation', 'description', 'classification', 'matiere', 'image', 'pdfs_utilisation', 'pdfs_maintenance'])
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -42,7 +42,7 @@ def read_equipments():
 def write_equipments(equipments):
     try:
         with open(CSV_FILE, 'w', newline='', encoding='utf-8') as file:
-            fieldnames = ['id', 'designation', 'description', 'classification', 'matiere', 'image', 'pdfs']
+            fieldnames = ['id', 'designation', 'description', 'classification', 'matiere', 'image', 'pdfs_utilisation', 'pdfs_maintenance']
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
             for equipment in equipments:
@@ -96,15 +96,25 @@ def add_equipment():
                 image_filename = secure_filename(f"{uuid.uuid4()}_{image.filename}")
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
         
-        # Gestion des PDFs
-        pdf_filenames = []
-        if 'pdfs' in request.files:
-            pdfs = request.files.getlist('pdfs')
+        # Gestion des PDFs de fonctionnement
+        pdf_utilisation_filenames = []
+        if 'pdfs_utilisation' in request.files:
+            pdfs = request.files.getlist('pdfs_utilisation')
             for pdf in pdfs:
                 if pdf and allowed_file(pdf.filename):
                     pdf_filename = secure_filename(f"{uuid.uuid4()}_{pdf.filename}")
                     pdf.save(os.path.join(app.config['UPLOAD_FOLDER'], pdf_filename))
-                    pdf_filenames.append(pdf_filename)
+                    pdf_utilisation_filenames.append(pdf_filename)
+        
+        # Gestion des PDFs de maintenance
+        pdf_maintenance_filenames = []
+        if 'pdfs_maintenance' in request.files:
+            pdfs = request.files.getlist('pdfs_maintenance')
+            for pdf in pdfs:
+                if pdf and allowed_file(pdf.filename):
+                    pdf_filename = secure_filename(f"{uuid.uuid4()}_{pdf.filename}")
+                    pdf.save(os.path.join(app.config['UPLOAD_FOLDER'], pdf_filename))
+                    pdf_maintenance_filenames.append(pdf_filename)
         
         # Création du nouvel équipement
         new_equipment = {
@@ -114,7 +124,8 @@ def add_equipment():
             'classification': classification,
             'matiere': matiere,
             'image': image_filename,
-            'pdfs': ';'.join(pdf_filenames)  # Stocker les noms de fichiers PDF séparés par des points-virgules
+            'pdfs_utilisation': ';'.join(pdf_utilisation_filenames),
+            'pdfs_maintenance': ';'.join(pdf_maintenance_filenames)
         }
         
         # Ajout à la liste des équipements
@@ -157,10 +168,10 @@ def edit_equipment(equipment_id):
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
                 equipment['image'] = image_filename
         
-        # Ajout de nouveaux PDFs si fournis
-        if 'pdfs' in request.files:
-            pdfs = request.files.getlist('pdfs')
-            current_pdfs = equipment['pdfs'].split(';') if equipment['pdfs'] else []
+        # Ajout de nouveaux PDFs de fonctionnement si fournis
+        if 'pdfs_utilisation' in request.files:
+            pdfs = request.files.getlist('pdfs_utilisation')
+            current_pdfs = equipment['pdfs_utilisation'].split(';') if equipment.get('pdfs_utilisation') else []
             
             for pdf in pdfs:
                 if pdf and pdf.filename and allowed_file(pdf.filename):
@@ -168,7 +179,20 @@ def edit_equipment(equipment_id):
                     pdf.save(os.path.join(app.config['UPLOAD_FOLDER'], pdf_filename))
                     current_pdfs.append(pdf_filename)
             
-            equipment['pdfs'] = ';'.join(filter(None, current_pdfs))
+            equipment['pdfs_utilisation'] = ';'.join(filter(None, current_pdfs))
+        
+        # Ajout de nouveaux PDFs de maintenance si fournis
+        if 'pdfs_maintenance' in request.files:
+            pdfs = request.files.getlist('pdfs_maintenance')
+            current_pdfs = equipment['pdfs_maintenance'].split(';') if equipment.get('pdfs_maintenance') else []
+            
+            for pdf in pdfs:
+                if pdf and pdf.filename and allowed_file(pdf.filename):
+                    pdf_filename = secure_filename(f"{uuid.uuid4()}_{pdf.filename}")
+                    pdf.save(os.path.join(app.config['UPLOAD_FOLDER'], pdf_filename))
+                    current_pdfs.append(pdf_filename)
+            
+            equipment['pdfs_maintenance'] = ';'.join(filter(None, current_pdfs))
         
         # Mise à jour dans la liste
         for i, eq in enumerate(equipments):
@@ -197,8 +221,15 @@ def delete_equipment(equipment_id):
     if equipment['image'] and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], equipment['image'])):
         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], equipment['image']))
     
-    if equipment['pdfs']:
-        for pdf in equipment['pdfs'].split(';'):
+    # Suppression des PDFs de fonctionnement
+    if equipment.get('pdfs_utilisation'):
+        for pdf in equipment['pdfs_utilisation'].split(';'):
+            if pdf and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], pdf)):
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pdf))
+    
+    # Suppression des PDFs de maintenance
+    if equipment.get('pdfs_maintenance'):
+        for pdf in equipment['pdfs_maintenance'].split(';'):
             if pdf and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], pdf)):
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pdf))
     

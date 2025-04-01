@@ -59,16 +59,37 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="pdfs" class="form-label">Documents PDF additionnels</label>
-                        <input type="file" class="form-control" id="pdfs" name="pdfs" accept="application/pdf" multiple>
+                        <label for="pdfs_utilisation" class="form-label">Documents PDF additionnels - Fonctionnement</label>
+                        <input type="file" class="form-control" id="pdfs_utilisation" name="pdfs_utilisation" accept="application/pdf" multiple>
                         <div class="form-text">Les nouveaux fichiers seront ajoutés aux existants</div>
                     </div>
                     
-                    {% if equipment.pdfs %}
+                    <div class="mb-3">
+                        <label for="pdfs_maintenance" class="form-label">Documents PDF additionnels - Maintenance</label>
+                        <input type="file" class="form-control" id="pdfs_maintenance" name="pdfs_maintenance" accept="application/pdf" multiple>
+                        <div class="form-text">Les nouveaux fichiers seront ajoutés aux existants</div>
+                    </div>
+                    
+                    {% if equipment.pdfs_utilisation %}
                         <div class="mb-3">
-                            <label class="form-label">Documents existants</label>
+                            <label class="form-label">Documents existants - Fonctionnement</label>
                             <div class="list-group">
-                                {% for pdf in equipment.pdfs.split(';') %}
+                                {% for pdf in equipment.pdfs_utilisation.split(';') %}
+                                    {% if pdf %}
+                                        <a href="{{ url_for('uploaded_file', filename=pdf) }}" class="list-group-item list-group-item-action" target="_blank">
+                                            <i class="fas fa-file-pdf me-2 text-danger"></i> {{ pdf.split('_', 1)[1] }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if equipment.pdfs_maintenance %}
+                        <div class="mb-3">
+                            <label class="form-label">Documents existants - Maintenance</label>
+                            <div class="list-group">
+                                {% for pdf in equipment.pdfs_maintenance.split(';') %}
                                     {% if pdf %}
                                         <a href="{{ url_for('uploaded_file', filename=pdf) }}" class="list-group-item list-group-item-action" target="_blank">
                                             <i class="fas fa-file-pdf me-2 text-danger"></i> {{ pdf.split('_', 1)[1] }}
