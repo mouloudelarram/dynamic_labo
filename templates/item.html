@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item['designation'] }}</title>
+</head>
+<body>
+    <h1>{{ item['designation'] }}</h1>
+    <p>{{ item['descriptif'] }}</p>
+    <p>Classification: {{ item['classification'] }}</p>
+    <p>Matière: {{ item['matiere'] }}</p>
+    <img src="{{ item['image'] }}" alt="{{ item['designation'] }}" style="width:200px;">
+    <p><a href="{{ item['pdf'] }}" target="_blank">Télécharger le PDF</a></p>
+
+    <a href="{{ url_for('index') }}">Retour à la liste</a>
+</body>
+</html>

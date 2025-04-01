@@ -1,0 +1,74 @@
+
+<!-- templates/add_equipment.html -->
+{% extends 'base.html' %}
+
+{% block title %}Ajouter un équipement{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
+                <li class="breadcrumb-item active">Ajouter un équipement</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Ajouter un nouvel équipement</h2>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('add_equipment') }}" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="designation" class="form-label">Désignation *</label>
+                        <input type="text" class="form-control" id="designation" name="designation" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="classification" class="form-label">Classification *</label>
+                        <input type="text" class="form-control" id="classification" name="classification" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="matiere" class="form-label">Matière *</label>
+                        <input type="text" class="form-control" id="matiere" name="matiere" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <div class="form-text">Format recommandé: JPG, PNG (max 5MB)</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description *</label>
+                        <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="pdfs" class="form-label">Documents PDF</label>
+                        <input type="file" class="form-control" id="pdfs" name="pdfs" accept="application/pdf" multiple>
+                        <div class="form-text">Vous pouvez sélectionner plusieurs fichiers PDF (max 10MB chacun)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i> Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

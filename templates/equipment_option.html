@@ -1,0 +1,107 @@
+<!-- templates/equipment_option.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ equipment.designation }} - {{ 'Fonctionnement' if option == 'utilisation' else 'Maintenance' }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('equipment_details', equipment_id=equipment.id) }}">{{ equipment.designation }}</a></li>
+                <li class="breadcrumb-item active">{{ 'Fonctionnement' if option == 'utilisation' else 'Maintenance' }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-{{ 'success' if option == 'utilisation' else 'info' }} text-white">
+        <h2 class="mb-0">{{ equipment.designation }} - {{ 'Fonctionnement' if option == 'utilisation' else 'Maintenance' }}</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                {% if equipment.image %}
+                    <img src="{{ url_for('uploaded_file', filename=equipment.image) }}" class="img-fluid rounded mb-4" alt="{{ equipment.designation }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light rounded mb-4" style="height: 200px;">
+                        <i class="fas fa-microscope fa-5x text-secondary"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="list-group mb-4">
+                    <a href="{{ url_for('equipment_option', equipment_id=equipment.id, option='utilisation') }}" 
+                       class="list-group-item list-group-item-action {{ 'active' if option == 'utilisation' else '' }}">
+                        <i class="fas fa-play-circle me-2"></i> Fonctionnement
+                    </a>
+                    <a href="{{ url_for('equipment_option', equipment_id=equipment.id, option='maintenance') }}" 
+                       class="list-group-item list-group-item-action {{ 'active' if option == 'maintenance' else '' }}">
+                        <i class="fas fa-tools me-2"></i> Maintenance
+                    </a>
+                </div>
+                
+                <a href="{{ url_for('equipment_details', equipment_id=equipment.id) }}" class="btn btn-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i> Retour aux détails
+                </a>
+            </div>
+            <div class="col-md-8">
+                <h3 class="mb-4">
+                    {% if option == 'utilisation' %}
+                        <i class="fas fa-play-circle me-2 text-success"></i> Guide d'utilisation
+                    {% else %}
+                        <i class="fas fa-tools me-2 text-info"></i> Guide de maintenance
+                    {% endif %}
+                </h3>
+                
+                <div class="alert alert-{{ 'success' if option == 'utilisation' else 'info' }} mb-4">
+                    {% if option == 'utilisation' %}
+                        <p class="mb-0">Cette section décrit le fonctionnement et les procédures d'utilisation correctes pour {{ equipment.designation }}.</p>
+                    {% else %}
+                        <p class="mb-0">Cette section décrit les procédures de maintenance et d'entretien pour {{ equipment.designation }}.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="bg-light p-4 rounded">
+                    <!-- Cette section peut être remplacée par du contenu dynamique si nécessaire -->
+                    {% if option == 'utilisation' %}
+                        <h4>Mode d'emploi</h4>
+                        <p>Consultez les documents joints pour les instructions d'utilisation détaillées de {{ equipment.designation }}.</p>
+                        
+                        <h5>Points importants à respecter :</h5>
+                        <ul>
+                            <li>Vérifiez que l'équipement est en bon état avant utilisation</li>
+                            <li>Suivez les procédures de sécurité appropriées</li>
+                            <li>Reportez tout problème ou dysfonctionnement</li>
+                        </ul>
+                    {% else %}
+                        <h4>Procédures de maintenance</h4>
+                        <p>Consultez les documents joints pour les protocoles de maintenance détaillés de {{ equipment.designation }}.</p>
+                        
+                        <h5>Maintenance régulière :</h5>
+                        <ul>
+                            <li>Nettoyage hebdomadaire des surfaces externes</li>
+                            <li>Vérification mensuelle des composants</li>
+                            <li>Étalonnage selon les recommandations du fabricant</li>
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                {% if equipment.pdfs %}
+                    <h4 class="mt-4 mb-3">Documents associés</h4>
+                    <div class="list-group">
+                        {% for pdf in equipment.pdfs.split(';') %}
+                            {% if pdf %}
+                                <a href="{{ url_for('uploaded_file', filename=pdf) }}" class="list-group-item list-group-item-action" target="_blank">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i> {{ pdf.split('_', 1)[1] }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

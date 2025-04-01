@@ -1,0 +1,102 @@
+<!-- templates/equipment_details.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ equipment.designation }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Accueil</a></li>
+                <li class="breadcrumb-item active">{{ equipment.designation }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">{{ equipment.designation }}</h2>
+            <div>
+                <a href="{{ url_for('edit_equipment', equipment_id=equipment.id) }}" class="btn btn-light btn-sm me-2">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-5">
+                {% if equipment.image %}
+                    <img src="{{ url_for('uploaded_file', filename=equipment.image) }}" class="img-fluid rounded" alt="{{ equipment.designation }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light rounded" style="height: 300px;">
+                        <i class="fas fa-microscope fa-5x text-secondary"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-7">
+                <h4 class="mb-3">Informations générales</h4>
+                <div class="mb-4">
+                    <p><strong>Classification :</strong> {{ equipment.classification }}</p>
+                    <p><strong>Matière :</strong> {{ equipment.matiere }}</p>
+                    <p><strong>Description :</strong> {{ equipment.description }}</p>
+                </div>
+                
+                <h4 class="mb-3">Options</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="{{ url_for('equipment_option', equipment_id=equipment.id, option='utilisation') }}" class="btn btn-success option-btn">
+                            <i class="fas fa-play-circle me-2"></i> Fonctionnement
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ url_for('equipment_option', equipment_id=equipment.id, option='maintenance') }}" class="btn btn-info option-btn">
+                            <i class="fas fa-tools me-2"></i> Maintenance
+                        </a>
+                    </div>
+                </div>
+                
+                {% if equipment.pdfs %}
+                    <h4 class="mb-3 mt-4">Documents</h4>
+                    <div class="list-group">
+                        {% for pdf in equipment.pdfs.split(';') %}
+                            {% if pdf %}
+                                <a href="{{ url_for('uploaded_file', filename=pdf) }}" class="list-group-item list-group-item-action" target="_blank">
+                                    <i class="fas fa-file-pdf me-2 text-danger"></i> {{ pdf.split('_', 1)[1] }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer <strong>{{ equipment.designation }}</strong> ? Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('delete_equipment', equipment_id=equipment.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

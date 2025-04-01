@@ -1,0 +1,82 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <h1 class="text-center mb-4">Catalogue du Matériel de Laboratoire</h1>
+        <p class="text-center lead">Consultez notre catalogue complet d'équipements de laboratoire, incluant les informations sur leur fonctionnement et leur maintenance.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="input-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un équipement...">
+            <button class="btn btn-primary" type="button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% if equipments %}
+        {% for equipment in equipments %}
+            <div class="col-md-4 equipment-card">
+                <div class="card h-100">
+                    {% if equipment.image %}
+                        <img src="{{ url_for('uploaded_file', filename=equipment.image) }}" class="card-img-top equipment-image" alt="{{ equipment.designation }}">
+                    {% else %}
+                        <div class="card-img-top equipment-image d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-microscope fa-5x text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ equipment.designation }}</h5>
+                        <p class="card-text text-muted">{{ equipment.classification }}</p>
+                        <p class="card-text">{{ equipment.description|truncate(100) }}</p>
+                        <a href="{{ url_for('equipment_details', equipment_id=equipment.id) }}" class="btn btn-primary">
+                            <i class="fas fa-info-circle me-1"></i> Détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Aucun équipement n'a été ajouté pour le moment.
+                <a href="{{ url_for('add_equipment') }}" class="alert-link">Ajouter un équipement</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const equipmentCards = document.querySelectorAll('.equipment-card');
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            equipmentCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const description = card.querySelector('.card-text:not(.text-muted)').textContent.toLowerCase();
+                const classification = card.querySelector('.text-muted').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm) || classification.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
