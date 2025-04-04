@@ -4,6 +4,7 @@ import os
 import csv
 import uuid
 from werkzeug.utils import secure_filename
+import signal
 
 app = Flask(__name__)
 app.secret_key = 'votre_clef_secrete'  # Nécessaire pour les messages flash
@@ -242,6 +243,21 @@ def delete_equipment(equipment_id):
         flash('Erreur lors de la suppression de l\'équipement', 'error')
     
     return redirect(url_for('index'))
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    # This will return a response that triggers the tab to close first
+    response = {"status": "shutting_down"}
+    # Schedule the server to shut down after sending the response
+    def shutdown_server():
+        # Give a small delay to allow the response to be sent
+        os.kill(os.getpid(), signal.SIGINT)
+    
+    # Schedule the shutdown after a brief delay
+    from threading import Timer
+    Timer(0.5, shutdown_server).start()
+    
+    return response
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

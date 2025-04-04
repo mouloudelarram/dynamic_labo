@@ -48,6 +48,18 @@
             margin-bottom: 30px;
             border-radius: 10px;
         }
+        .shutdown-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .shutdown-btn:hover {
+            background-color: #cc0000;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -67,6 +79,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('add_equipment') }}">Ajouter un équipement</a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/shutdown" method="post">
+                            <button type="submit" class="shutdown-btn">Shutdown Server</button>
+                        </form>
                     </li>
                 </ul>
             </div>
@@ -91,10 +108,52 @@
     <footer class="footer mt-5">
         <div class="container text-center">
             <p>&copy; 2025 - Application de Gestion du Matériel de Laboratoire</p>
+            <p class="mt-2">
+                Contact: <a href="mailto:contact@labo-gestion.com">contact@labo-gestion.com</a> | 
+                Téléphone: <a href="tel:+33123456789">+33 1 23 45 67 89</a>
+            </p>
+            <div class="mt-2">
+                <a href="#" class="mx-2">Mentions légales</a> | 
+                <a href="#" class="mx-2">Politique de confidentialité</a> | 
+                <a href="#" class="mx-2">Aide</a>
+            </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('shutdownBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to shut down the server and close this tab?')) {
+                // Send shutdown request
+                fetch('/shutdown', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "shutting_down") {
+                        // Close the browser tab
+                        window.close();
+                        
+                        // In case window.close() doesn't work (due to browser security)
+                        // Show a message that it's safe to close
+                        setTimeout(function() {
+                            document.body.innerHTML = 
+                                '<h1>Server is shutting down</h1>' +
+                             '<p>It is now safe to close this tab.</p>';
+                        }, 500);
+                    }
+                })
+                .catch(error => {
+                    // If there's an error, it likely means the server is already shutting down
+                    console.log('Server is shutting down:', error);
+                    window.close();
+                });
+            }
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
