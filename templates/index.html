@@ -6,8 +6,10 @@
 {% block content %}
 <div class="hero-section">
     <div class="container">
-        <h1 class="text-center mb-4">Catalogue du Matériel de Laboratoire</h1>
-        <p class="text-center lead">Consultez notre catalogue complet d'équipements de laboratoire, incluant les informations sur leur fonctionnement et leur maintenance.</p>
+        <h1 class="text-center mb-4">Laboguide</h1>
+        <p class="text-center lead" style="text-align: justify;">Bienvenue sur notre plateforme dédiée au matériel de laboratoire
+            Découvrez un catalogue complet d'équipements scientifiques avec des fiches détaillées sur leur fonctionnement, leur utilisation correcte et les procédures de maintenance à suivre.
+            Notre objectif est de faciliter le travail des préparateurs, enseignants et étudiants en leur fournissant des informations claires et accessibles pour garantir la sécurité, la précision et la durabilité des instruments utilisés en laboratoire.</p>
     </div>
 </div>
 
@@ -58,6 +60,7 @@
 
 {% block extra_js %}
 <script>
+    console.log("created by @mouloud el arram all rights reserved")
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
         const equipmentCards = document.querySelectorAll('.equipment-card');

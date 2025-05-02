@@ -264,4 +264,5 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
+    print("created by @mouloud el arram all rights reserved")
     app.run(debug=True)
